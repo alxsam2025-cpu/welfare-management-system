@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { formatCurrency } from '@/utils/currency'
 import { 
   BookOpen, 
   ArrowLeft,
@@ -10,6 +9,10 @@ import {
   Calendar,
   DollarSign
 } from 'lucide-react'
+
+const formatCurrency = (amount: number) => {
+  return `₵${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
 
 interface JournalEntry {
   id: string
@@ -36,7 +39,9 @@ export default function JournalPage() {
 
   useEffect(() => {
     const loadEntries = () => {
-      const demoEntries: JournalEntry[] = [
+      try {
+        console.log('Loading journal entries...')
+        const demoEntries: JournalEntry[] = [
         {
           id: '1',
           date: '2024-02-15',
@@ -47,10 +52,16 @@ export default function JournalPage() {
           amount: 250.00
         }
       ]
+      console.log('Setting entries:', demoEntries.length, 'entries')
       setEntries(demoEntries)
       setIsLoading(false)
+      console.log('Journal entries loaded successfully')
+      } catch (error) {
+        console.error('Error loading journal entries:', error)
+        setIsLoading(false)
+      }
     }
-    setTimeout(loadEntries, 100)
+    loadEntries()
   }, [])
 
 

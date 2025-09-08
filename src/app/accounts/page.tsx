@@ -47,7 +47,9 @@ export default function ChartOfAccountsPage() {
   useEffect(() => {
     // Load demo chart of accounts data
     const loadAccounts = () => {
-      const demoAccounts: ChartAccount[] = [
+      try {
+        console.log('Loading accounts data...')
+        const demoAccounts: ChartAccount[] = [
         {
           id: '1',
           accountCode: '1000',
@@ -170,19 +172,21 @@ export default function ChartOfAccountsPage() {
         }
       ]
       
+      console.log('Setting accounts:', demoAccounts.length, 'accounts')
       setAccounts(demoAccounts)
       setIsLoading(false)
+      console.log('Accounts loaded successfully')
+      } catch (error) {
+        console.error('Error loading accounts:', error)
+        setIsLoading(false)
+      }
     }
 
-    setTimeout(loadAccounts, 100)
+    loadAccounts()
   }, [])
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-GH', {
-      style: 'currency',
-      currency: 'GHC',
-      minimumFractionDigits: 2,
-    }).format(amount)
+    return `₵${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
   const getAccountTypeColor = (type: string) => {
