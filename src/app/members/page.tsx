@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { formatCurrency } from '@/utils/currency'
 import { 
   Users, 
   Plus, 
@@ -43,6 +44,17 @@ export default function MembersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [showAddForm, setShowAddForm] = useState(false)
+  const [newMember, setNewMember] = useState<Partial<Member>>({
+    fullName: '',
+    staffId: '',
+    email: '',
+    phone: '',
+    constituency: '',
+    mpName: '',
+    floorNumber: '',
+    roomNumber: '',
+    telephoneContact: '',
+  })
 
   useEffect(() => {
     // Load demo members data
@@ -121,13 +133,6 @@ export default function MembersPage() {
     setTimeout(loadMembers, 500)
   }, [])
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-GH', {
-      style: 'currency',
-      currency: 'GHC',
-      minimumFractionDigits: 2,
-    }).format(amount)
-  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -317,6 +322,185 @@ export default function MembersPage() {
           )}
         </div>
       </div>
+
+      {/* Add Member Modal */}
+      {showAddForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Add New Member</h2>
+              
+              <form onSubmit={(e) => {
+                e.preventDefault()
+                const newId = (members.length + 1).toString()
+                const memberToAdd: Member = {
+                  ...newMember as Member,
+                  id: newId,
+                  joinedDate: new Date().toISOString().split('T')[0],
+                  status: 'active',
+                  totalContributions: 0,
+                  activeLoans: 0
+                }
+                setMembers(prev => [memberToAdd, ...prev])
+                setNewMember({
+                  fullName: '',
+                  staffId: '',
+                  email: '',
+                  phone: '',
+                  constituency: '',
+                  mpName: '',
+                  floorNumber: '',
+                  roomNumber: '',
+                  telephoneContact: '',
+                })
+                setShowAddForm(false)
+              }} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newMember.fullName || ''}
+                      onChange={(e) => setNewMember({...newMember, fullName: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter member's full name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Staff ID *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newMember.staffId || ''}
+                      onChange={(e) => setNewMember({...newMember, staffId: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. RA005"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      value={newMember.email || ''}
+                      onChange={(e) => setNewMember({...newMember, email: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="member@parliament.gh"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                    <input
+                      type="tel"
+                      required
+                      value={newMember.phone || ''}
+                      onChange={(e) => setNewMember({...newMember, phone: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="+233244123456"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Constituency *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newMember.constituency || ''}
+                      onChange={(e) => setNewMember({...newMember, constituency: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Accra Central"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">MP Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newMember.mpName || ''}
+                      onChange={(e) => setNewMember({...newMember, mpName: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Hon. Mary Adjei"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Floor Number</label>
+                    <input
+                      type="text"
+                      value={newMember.floorNumber || ''}
+                      onChange={(e) => setNewMember({...newMember, floorNumber: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. 2nd Floor"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Room Number</label>
+                    <input
+                      type="text"
+                      value={newMember.roomNumber || ''}
+                      onChange={(e) => setNewMember({...newMember, roomNumber: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Room 205"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Office Phone</label>
+                    <input
+                      type="tel"
+                      value={newMember.telephoneContact || ''}
+                      onChange={(e) => setNewMember({...newMember, telephoneContact: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="+233302123456"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddForm(false)
+                      setNewMember({
+                        fullName: '',
+                        staffId: '',
+                        email: '',
+                        phone: '',
+                        constituency: '',
+                        mpName: '',
+                        floorNumber: '',
+                        roomNumber: '',
+                        telephoneContact: '',
+                      })
+                    }}
+                    className="btn btn-outline flex-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary flex-1"
+                  >
+                    Add Member
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

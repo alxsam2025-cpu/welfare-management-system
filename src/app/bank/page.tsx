@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { formatCurrency } from '@/utils/currency'
+import { getBankNames } from '@/utils/banks'
 import { 
   Building2, 
   ArrowLeft,
@@ -87,13 +89,6 @@ export default function BankAccountPage() {
     setTimeout(loadAccounts, 500)
   }, [])
 
-  const formatCurrency = (amount: number, currency: string = 'GHC') => {
-    return new Intl.NumberFormat('en-GH', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-    }).format(amount)
-  }
 
   const getAccountTypeColor = (type: string) => {
     switch (type) {
@@ -212,7 +207,7 @@ export default function BankAccountPage() {
                     
                     <div className="text-right">
                       <p className="text-2xl font-bold text-green-600 mb-1">
-                        {formatCurrency(account.balance, account.currency)}
+                        {formatCurrency(account.balance)}
                       </p>
                       <div className="flex items-center gap-2 justify-end">
                         <div className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getAccountTypeColor(account.accountType)}`}>
@@ -288,11 +283,12 @@ export default function BankAccountPage() {
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
-                      <input
-                        type="text"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g. Ghana Commercial Bank"
-                      />
+                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Bank</option>
+                        {getBankNames().map(bankName => (
+                          <option key={bankName} value={bankName}>{bankName}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                   
