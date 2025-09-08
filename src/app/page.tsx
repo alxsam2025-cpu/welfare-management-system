@@ -61,57 +61,76 @@ export default function Dashboard() {
   useEffect(() => {
     // Load dashboard data immediately with demo data
     const loadDashboardData = () => {
-      // Set demo stats for PRAWS
-      setStats({
-        totalMembers: 276, // All Research Assistants
-        activeLoans: 43,
-        totalContributions: 156780.50,
-        pendingApplications: 12,
-        monthlyGrowth: 15.3,
-        loanDefaultRate: 2.1,
-        totalDisbursed: 89450.00,
-        availableFunds: 234567.89
-      })
+      try {
+        // Set demo stats for PRAWS
+        setStats({
+          totalMembers: 276, // All Research Assistants
+          activeLoans: 43,
+          totalContributions: 156780.50,
+          pendingApplications: 12,
+          monthlyGrowth: 15.3,
+          loanDefaultRate: 2.1,
+          totalDisbursed: 89450.00,
+          availableFunds: 234567.89
+        })
 
-      setActivities([
-        {
-          id: '1',
-          type: 'member',
-          description: 'New member registration: John Doe (Accra Central)',
-          timestamp: new Date(Date.now() - 1000 * 60 * 15),
-          status: 'success'
-        },
-        {
-          id: '2',
-          type: 'loan',
-          description: 'Personal loan approved - 6 months (3% interest)',
-          amount: 5000,
-          timestamp: new Date(Date.now() - 1000 * 60 * 30),
-          status: 'success'
-        },
-        {
-          id: '3',
-          type: 'payment',
-          description: 'Monthly welfare contribution received',
-          amount: 250,
-          timestamp: new Date(Date.now() - 1000 * 60 * 45),
-          status: 'success'
-        },
-        {
-          id: '4',
-          type: 'welfare',
-          description: 'Emergency medical support disbursed',
-          amount: 1500,
-          timestamp: new Date(Date.now() - 1000 * 60 * 60),
-          status: 'pending'
-        }
-      ])
+        setActivities([
+          {
+            id: '1',
+            type: 'member',
+            description: 'New member registration: John Doe (Accra Central)',
+            timestamp: new Date(Date.now() - 1000 * 60 * 15),
+            status: 'success'
+          },
+          {
+            id: '2',
+            type: 'loan',
+            description: 'Personal loan approved - 6 months (3% interest)',
+            amount: 5000,
+            timestamp: new Date(Date.now() - 1000 * 60 * 30),
+            status: 'success'
+          },
+          {
+            id: '3',
+            type: 'payment',
+            description: 'Monthly welfare contribution received',
+            amount: 250,
+            timestamp: new Date(Date.now() - 1000 * 60 * 45),
+            status: 'success'
+          },
+          {
+            id: '4',
+            type: 'welfare',
+            description: 'Emergency medical support disbursed',
+            amount: 1500,
+            timestamp: new Date(Date.now() - 1000 * 60 * 60),
+            status: 'pending'
+          }
+        ])
 
-      setIsLoading(false)
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Error loading dashboard data:', error)
+        // Always set loading to false to prevent infinite loading
+        setIsLoading(false)
+      }
     }
 
-    // Small delay for loading effect
-    setTimeout(loadDashboardData, 800)
+    // Load immediately first
+    loadDashboardData()
+    
+    // Also set a timeout as backup
+    const timeoutId = setTimeout(loadDashboardData, 200)
+    
+    // Final fallback to ensure loading never stays true forever
+    const fallbackId = setTimeout(() => {
+      setIsLoading(false)
+    }, 2000)
+    
+    return () => {
+      clearTimeout(timeoutId)
+      clearTimeout(fallbackId)
+    }
   }, [])
 
   const formatCurrency = (amount: number) => {
