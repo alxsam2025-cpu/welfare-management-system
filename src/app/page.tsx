@@ -22,7 +22,11 @@ import {
   Banknote,
   UserPlus,
   FileCheck,
-  BookOpen
+  BookOpen,
+  Sparkles,
+  Zap,
+  Target,
+  Award
 } from 'lucide-react'
 
 interface DashboardStats {
@@ -59,6 +63,16 @@ export default function Dashboard() {
 
   const [activities, setActivities] = useState<RecentActivity[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [animatedStats, setAnimatedStats] = useState<DashboardStats>({
+    totalMembers: 0,
+    activeLoans: 0,
+    totalContributions: 0,
+    pendingApplications: 0,
+    monthlyGrowth: 0,
+    loanDefaultRate: 0,
+    totalDisbursed: 0,
+    availableFunds: 0
+  })
 
   useEffect(() => {
     // Load dashboard data immediately with demo data
@@ -111,11 +125,45 @@ export default function Dashboard() {
         ])
 
         setIsLoading(false)
+        
+        // Animate the numbers
+        animateNumbers()
       } catch (error) {
         console.error('Error loading dashboard data:', error)
         // Always set loading to false to prevent infinite loading
         setIsLoading(false)
       }
+    }
+    
+    const animateNumbers = () => {
+      const duration = 2000 // 2 seconds
+      const steps = 60
+      const stepDuration = duration / steps
+      
+      let currentStep = 0
+      
+      const animate = () => {
+        if (currentStep <= steps) {
+          const progress = currentStep / steps
+          const easeOut = 1 - Math.pow(1 - progress, 3)
+          
+          setAnimatedStats({
+            totalMembers: Math.floor(276 * easeOut),
+            activeLoans: Math.floor(43 * easeOut),
+            totalContributions: 156780.50 * easeOut,
+            pendingApplications: Math.floor(12 * easeOut),
+            monthlyGrowth: 15.3 * easeOut,
+            loanDefaultRate: 2.1 * easeOut,
+            totalDisbursed: 89450.00 * easeOut,
+            availableFunds: 234567.89 * easeOut
+          })
+          
+          currentStep++
+          setTimeout(animate, stepDuration)
+        }
+      }
+      
+      animate()
     }
 
     // Load immediately first
@@ -289,66 +337,94 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats Grid */}
+        {/* Modern Animated Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Total Members */}
-          <div className="stat-card-primary fade-in">
-            <div className="flex items-center justify-between">
+          {/* Total Members - Animated */}
+          <div className="group relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-2xl hover:shadow-blue-500/25 transition-all duration-500 hover:scale-105 fade-in">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <Sparkles className="w-6 h-6 text-blue-200 animate-pulse" />
+              </div>
               <div>
-                <p className="text-blue-100 text-sm font-medium">Total Members</p>
-                <p className="text-3xl font-bold">{stats.totalMembers.toLocaleString()}</p>
-                <div className="flex items-center mt-2 text-sm">
-                  <ArrowUp className="w-4 h-4 mr-1" />
-                  <span>+{stats.monthlyGrowth}% this month</span>
+                <p className="text-blue-100 text-sm font-medium mb-1">Total Members</p>
+                <p className="text-4xl font-bold mb-2 font-mono">{Math.floor(animatedStats.totalMembers).toLocaleString()}</p>
+                <div className="flex items-center text-sm text-blue-200">
+                  <ArrowUp className="w-4 h-4 mr-1 animate-bounce" />
+                  <span>+{animatedStats.monthlyGrowth.toFixed(1)}% this month</span>
                 </div>
               </div>
-              <Users className="w-12 h-12 text-blue-200" />
             </div>
+            <div className="absolute -bottom-1 -right-1 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
           </div>
 
-          {/* Active Loans */}
-          <div className="stat-card-success fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="flex items-center justify-between">
+          {/* Active Loans - Animated */}
+          <div className="group relative overflow-hidden bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-2xl hover:shadow-green-500/25 transition-all duration-500 hover:scale-105 fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <CreditCard className="w-8 h-8 text-white" />
+                </div>
+                <Target className="w-6 h-6 text-green-200 animate-pulse" />
+              </div>
               <div>
-                <p className="text-green-100 text-sm font-medium">Active Loans</p>
-                <p className="text-3xl font-bold">{stats.activeLoans}</p>
-                <div className="flex items-center mt-2 text-sm">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  <span>Low default rate: {stats.loanDefaultRate}%</span>
+                <p className="text-green-100 text-sm font-medium mb-1">Active Loans</p>
+                <p className="text-4xl font-bold mb-2 font-mono">{Math.floor(animatedStats.activeLoans)}</p>
+                <div className="flex items-center text-sm text-green-200">
+                  <TrendingUp className="w-4 h-4 mr-1 animate-bounce" />
+                  <span>Default rate: {animatedStats.loanDefaultRate.toFixed(1)}%</span>
                 </div>
               </div>
-              <CreditCard className="w-12 h-12 text-green-200" />
             </div>
+            <div className="absolute -bottom-1 -right-1 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
           </div>
 
-          {/* Total Contributions */}
-          <div className="stat-card-purple fade-in" style={{ animationDelay: '0.2s' }}>
-            <div className="flex items-center justify-between">
+          {/* Total Contributions - Animated */}
+          <div className="group relative overflow-hidden bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 hover:scale-105 fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <DollarSign className="w-8 h-8 text-white" />
+                </div>
+                <Zap className="w-6 h-6 text-purple-200 animate-pulse" />
+              </div>
               <div>
-                <p className="text-purple-100 text-sm font-medium">Total Contributions</p>
-                <p className="text-2xl font-bold">{formatCurrency(stats.totalContributions)}</p>
-                <div className="flex items-center mt-2 text-sm">
-                  <PiggyBank className="w-4 h-4 mr-1" />
-                  <span>Member contributions</span>
+                <p className="text-purple-100 text-sm font-medium mb-1">Total Contributions</p>
+                <p className="text-3xl font-bold mb-2 font-mono">{formatCurrency(animatedStats.totalContributions)}</p>
+                <div className="flex items-center text-sm text-purple-200">
+                  <PiggyBank className="w-4 h-4 mr-1 animate-bounce" />
+                  <span>Member welfare fund</span>
                 </div>
               </div>
-              <DollarSign className="w-12 h-12 text-purple-200" />
             </div>
+            <div className="absolute -bottom-1 -right-1 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
           </div>
 
-          {/* Pending Applications */}
-          <div className="stat-card-warning fade-in" style={{ animationDelay: '0.3s' }}>
-            <div className="flex items-center justify-between">
+          {/* Pending Applications - Animated */}
+          <div className="group relative overflow-hidden bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-2xl hover:shadow-orange-500/25 transition-all duration-500 hover:scale-105 fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <FileText className="w-8 h-8 text-white" />
+                </div>
+                <Award className="w-6 h-6 text-orange-200 animate-pulse" />
+              </div>
               <div>
-                <p className="text-orange-100 text-sm font-medium">Pending Applications</p>
-                <p className="text-3xl font-bold">{stats.pendingApplications}</p>
-                <div className="flex items-center mt-2 text-sm">
-                  <Clock className="w-4 h-4 mr-1" />
+                <p className="text-orange-100 text-sm font-medium mb-1">Pending Applications</p>
+                <p className="text-4xl font-bold mb-2 font-mono">{Math.floor(animatedStats.pendingApplications)}</p>
+                <div className="flex items-center text-sm text-orange-200">
+                  <Clock className="w-4 h-4 mr-1 animate-spin" />
                   <span>Awaiting review</span>
                 </div>
               </div>
-              <FileText className="w-12 h-12 text-orange-200" />
             </div>
+            <div className="absolute -bottom-1 -right-1 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
           </div>
         </div>
 

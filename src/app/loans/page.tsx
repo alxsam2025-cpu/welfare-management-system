@@ -17,7 +17,10 @@ import {
   DollarSign,
   ArrowLeft,
   Send,
-  AlertCircle
+  AlertCircle,
+  Upload,
+  FileText,
+  Trash2
 } from 'lucide-react'
 
 interface Loan {
@@ -57,6 +60,7 @@ export default function LoansPage() {
     purpose: '',
     termMonths: 3
   })
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
 
   useEffect(() => {
     // Load demo loans data
@@ -200,6 +204,7 @@ export default function LoansPage() {
       purpose: '',
       termMonths: 3
     })
+    setUploadedFiles([])
     setShowApplicationForm(false)
   }
 
@@ -476,6 +481,63 @@ export default function LoansPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Briefly describe the purpose of this loan"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Supporting Documents
+                    </label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                      <div className="text-center">
+                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
+                        <p className="text-sm text-gray-600 mb-2">
+                          Upload supporting documents (ID, Payslips, Bank Statements)
+                        </p>
+                        <input
+                          type="file"
+                          multiple
+                          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || [])
+                            setUploadedFiles(prev => [...prev, ...files])
+                          }}
+                          className="hidden"
+                          id="file-upload"
+                        />
+                        <label
+                          htmlFor="file-upload"
+                          className="btn btn-outline text-sm cursor-pointer inline-block"
+                        >
+                          Choose Files
+                        </label>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Max 5MB per file. PDF, JPG, PNG, DOC formats only.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {uploadedFiles.length > 0 && (
+                      <div className="mt-4 space-y-2">
+                        {uploadedFiles.map((file, index) => (
+                          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-blue-600" />
+                              <span className="text-sm text-gray-700">{file.name}</span>
+                              <span className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setUploadedFiles(prev => prev.filter((_, i) => i !== index))
+                              }}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

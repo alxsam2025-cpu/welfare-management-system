@@ -36,6 +36,13 @@ export default function ChartOfAccountsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [showAddForm, setShowAddForm] = useState(false)
+  const [newAccount, setNewAccount] = useState({
+    accountCode: '',
+    accountName: '',
+    accountType: 'ASSET' as 'ASSET' | 'LIABILITY' | 'EQUITY' | 'REVENUE' | 'EXPENSE',
+    description: '',
+    balance: 0
+  })
 
   useEffect(() => {
     // Load demo chart of accounts data
@@ -167,7 +174,7 @@ export default function ChartOfAccountsPage() {
       setIsLoading(false)
     }
 
-    setTimeout(loadAccounts, 500)
+    setTimeout(loadAccounts, 100)
   }, [])
 
   const formatCurrency = (amount: number) => {
@@ -409,6 +416,140 @@ export default function ChartOfAccountsPage() {
             </div>
           )}
         </div>
+
+        {/* Add Account Modal */}
+        {showAddForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Add New Account</h2>
+                
+                <form onSubmit={(e) => {
+                  e.preventDefault()
+                  const accountToAdd: ChartAccount = {
+                    ...newAccount,
+                    id: (accounts.length + 1).toString(),
+                    isActive: true,
+                    createdAt: new Date().toISOString().split('T')[0]
+                  }
+                  setAccounts(prev => [...prev, accountToAdd])
+                  setNewAccount({
+                    accountCode: '',
+                    accountName: '',
+                    accountType: 'ASSET',
+                    description: '',
+                    balance: 0
+                  })
+                  setShowAddForm(false)
+                }} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Account Code *</label>
+                      <input
+                        type="text"
+                        required
+                        value={newAccount.accountCode}
+                        onChange={(e) => setNewAccount({...newAccount, accountCode: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., 1400"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Account Type *</label>
+                      <select
+                        required
+                        value={newAccount.accountType}
+                        onChange={(e) => setNewAccount({...newAccount, accountType: e.target.value as any})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="ASSET">Asset</option>
+                        <option value="LIABILITY">Liability</option>
+                        <option value="EQUITY">Equity</option>
+                        <option value="REVENUE">Revenue</option>
+                        <option value="EXPENSE">Expense</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Account Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newAccount.accountName}
+                      onChange={(e) => setNewAccount({...newAccount, accountName: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter account name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                    <textarea
+                      required
+                      value={newAccount.description}
+                      onChange={(e) => setNewAccount({...newAccount, description: e.target.value})}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Describe the purpose of this account"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Opening Balance (₵) *</label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      step="0.01"
+                      value={newAccount.balance || ''}
+                      onChange={(e) => setNewAccount({...newAccount, balance: Number(e.target.value)})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="text-sm font-medium text-blue-800 mb-2">Account Type Guidelines:</h3>
+                    <ul className="text-xs text-blue-700 space-y-1">
+                      <li><strong>Assets:</strong> Items of value owned (Cash, Receivables, Equipment)</li>
+                      <li><strong>Liabilities:</strong> Amounts owed to others (Payables, Loans)</li>
+                      <li><strong>Equity:</strong> Owner's interest in the organization</li>
+                      <li><strong>Revenue:</strong> Income earned from operations</li>
+                      <li><strong>Expenses:</strong> Costs incurred in operations</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAddForm(false)
+                        setNewAccount({
+                          accountCode: '',
+                          accountName: '',
+                          accountType: 'ASSET',
+                          description: '',
+                          balance: 0
+                        })
+                      }}
+                      className="btn btn-outline flex-1"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary flex-1"
+                    >
+                      Create Account
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
