@@ -193,11 +193,11 @@ export default function Dashboard() {
                 Add Member
               </Link>
               <Link
-                href="/loans/apply"
-                className="btn btn-warning flex items-center gap-2"
+                href="/loans"
+                className="btn btn-primary flex items-center gap-2"
               >
-                <Plus className="w-5 h-5" />
-                Apply for Loan
+                <CreditCard className="w-5 h-5" />
+                Loan Management
               </Link>
             </div>
           </div>
@@ -357,9 +357,9 @@ export default function Dashboard() {
               <FileCheck className="w-6 h-6" />
               <span className="text-xs">Welfare</span>
             </Link>
-            <Link href="/business" className="btn btn-outline flex-col h-24 gap-2">
+            <Link href="/accounts" className="btn btn-outline flex-col h-24 gap-2">
               <Building2 className="w-6 h-6" />
-              <span className="text-xs">Business</span>
+              <span className="text-xs">Accounts</span>
             </Link>
             <Link href="/reports" className="btn btn-outline flex-col h-24 gap-2">
               <FileText className="w-6 h-6" />
