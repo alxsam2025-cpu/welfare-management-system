@@ -365,6 +365,10 @@ export default function Dashboard() {
               <FileText className="w-6 h-6" />
               <span className="text-xs">Reports</span>
             </Link>
+            <Link href="/demo" className="btn btn-secondary flex-col h-24 gap-2">
+              <Eye className="w-6 h-6" />
+              <span className="text-xs">Demo</span>
+            </Link>
           </div>
         </div>
 
