@@ -59,14 +59,11 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate loading dashboard data
-    const loadDashboardData = async () => {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Mock data - replace with actual API calls
+    // Load dashboard data immediately with demo data
+    const loadDashboardData = () => {
+      // Set demo stats for PRAWS
       setStats({
-        totalMembers: 247,
+        totalMembers: 276, // All Research Assistants
         activeLoans: 43,
         totalContributions: 156780.50,
         pendingApplications: 12,
@@ -80,14 +77,14 @@ export default function Dashboard() {
         {
           id: '1',
           type: 'member',
-          description: 'New member registration: John Doe',
+          description: 'New member registration: John Doe (Accra Central)',
           timestamp: new Date(Date.now() - 1000 * 60 * 15),
           status: 'success'
         },
         {
           id: '2',
           type: 'loan',
-          description: 'Loan application approved',
+          description: 'Personal loan approved - 6 months (3% interest)',
           amount: 5000,
           timestamp: new Date(Date.now() - 1000 * 60 * 30),
           status: 'success'
@@ -95,7 +92,7 @@ export default function Dashboard() {
         {
           id: '3',
           type: 'payment',
-          description: 'Monthly contribution received',
+          description: 'Monthly welfare contribution received',
           amount: 250,
           timestamp: new Date(Date.now() - 1000 * 60 * 45),
           status: 'success'
@@ -103,7 +100,7 @@ export default function Dashboard() {
         {
           id: '4',
           type: 'welfare',
-          description: 'Emergency support disbursed',
+          description: 'Emergency medical support disbursed',
           amount: 1500,
           timestamp: new Date(Date.now() - 1000 * 60 * 60),
           status: 'pending'
@@ -113,13 +110,16 @@ export default function Dashboard() {
       setIsLoading(false)
     }
 
-    loadDashboardData()
+    // Small delay for loading effect
+    setTimeout(loadDashboardData, 800)
   }, [])
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GH', {
       style: 'currency',
-      currency: 'GHC'
+      currency: 'GHC',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(amount)
   }
 
