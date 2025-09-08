@@ -1,0 +1,778 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Authentication
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  member          Member? @relation("UserMember")
+  createdMembers  Member[] @relation("CreatedBy")
+  createdPayments Payment[] @relation("CreatedPayments")
+  processedLoans  Loan[] @relation("ProcessedLoans")
+  auditLogs       AuditLog[]
+  journalEntries  JournalEntry[] @relation("CreatedJournalEntries")
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  COMMITTEE_MEMBER
+  OVERSIGHT_COMMITTEE
+  ACCOUNTANT
+}
+
+// Member Management
+model Member {
+  id             String         @id @default(cuid())
+  memberNumber   String         @unique
+  firstName      String
+  lastName       String
+  middleName     String?
+  fullName       String         // Computed: firstName + middleName + lastName
+  email          String         @unique
+  phoneNumber    String
+  dateOfBirth    DateTime
+  gender         Gender
+  maritalStatus  MaritalStatus
+  address        String
+  emergencyContact String
+  emergencyPhone String
+  nationalId     String?        @unique
+  
+  // Employment Information
+  employerName   String?
+  jobTitle       String?
+  employmentDate DateTime?
+  monthlyIncome  Float?
+  
+  // Enhanced Parliamentary Information
+  parliamentHouse ParliamentHouse?
+  constituency   String         // Required: Member's constituency
+  mpName         String         // Required: MP's full name
+  floorNumber    String?        // Floor in Parliament building
+  roomNumber     String?        // Room number in Parliament
+  telephoneContact String?       // Parliament telephone
+  contractStartDate DateTime?
+  contractEndDate   DateTime?
+  
+  // Membership Status
+  status         MemberStatus   @default(ACTIVE)
+  joinDate       DateTime       @default(now())
+  
+  // Financial Summary
+  totalContributions Float @default(0)
+  totalLoansTaken    Float @default(0)
+  totalLoansRepaid   Float @default(0)
+  currentLoanBalance Float @default(0)
+  esbContribution    Float @default(0)
+  
+  // Relations
+  user           User?          @relation("UserMember", fields: [userId], references: [id])
+  userId         String?        @unique
+  createdBy      User           @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById    String
+  
+  payments       Payment[]
+  loans          Loan[]
+  loanApplications LoanApplication[]
+  welfareApplications WelfareApplication[]
+  businessServices BusinessService[]
+  esbRecords     ESBRecord[]
+  bankAccounts   BankAccount[]
+  paymentMatches PaymentMatch[]
+  
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@map("members")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+}
+
+enum ParliamentHouse {
+  NATIONAL_ASSEMBLY
+  SENATE
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+// Bank Account Management
+model BankAccount {
+  id            String      @id @default(cuid())
+  member        Member      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId      String
+  
+  bankName      String
+  accountNumber String
+  accountName   String
+  branchName    String?
+  branchCode    String?
+  swiftCode     String?
+  routingNumber String?
+  
+  accountType   BankAccountType @default(SAVINGS)
+  currency      String      @default("GHC")
+  isActive      Boolean     @default(true)
+  isPrimary     Boolean     @default(false)
+  
+  // Verification
+  isVerified    Boolean     @default(false)
+  verifiedAt    DateTime?
+  verificationMethod String?
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([memberId, accountNumber])
+  @@map("bank_accounts")
+}
+
+enum BankAccountType {
+  SAVINGS
+  CHECKING
+  CURRENT
+  BUSINESS
+}
+
+// Payment Management
+model Payment {
+  id             String      @id @default(cuid())
+  receiptNumber  String      @unique
+  member         Member      @relation(fields: [memberId], references: [id])
+  memberId       String
+  paymentType    PaymentType
+  amount         Float
+  description    String?
+  paymentDate    DateTime    @default(now())
+  paymentMethod  PaymentMethod @default(CASH)
+  
+  // For loan repayments - Enhanced with interest tracking
+  loan           Loan?       @relation(fields: [loanId], references: [id])
+  loanId         String?
+  principalAmount Float?     @default(0)
+  interestAmount  Float?     @default(0)
+  
+  // Accounting reconciliation
+  isReconciled   Boolean     @default(false)
+  reconciledAt   DateTime?
+  reconciledBy   String?
+  
+  createdBy      User        @relation("CreatedPayments", fields: [createdById], references: [id])
+  createdById    String
+  createdAt      DateTime    @default(now())
+  
+  // Payment Matching
+  paymentMatches PaymentMatch[]
+
+  @@map("payments")
+}
+
+enum PaymentType {
+  MEMBERSHIP_FEE
+  MONTHLY_CONTRIBUTION
+  SPECIAL_LEVY
+  LOAN_REPAYMENT
+  FINE
+  ESB_CONTRIBUTION
+  BUSINESS_SUBSCRIPTION
+  INTEREST_PAYMENT
+  OTHER
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  MOBILE_MONEY
+  CHEQUE
+  CARD
+  ONLINE
+}
+
+// Enhanced Loan Management with Interest Rate Structure
+model LoanApplication {
+  id                 String              @id @default(cuid())
+  applicationNumber  String              @unique
+  member             Member              @relation(fields: [memberId], references: [id])
+  memberId           String
+  
+  // Loan Details with Enhanced Interest Structure
+  loanType           LoanType
+  requestedAmount    Float
+  purpose            String
+  repaymentPeriod    Int                 // in months (3, 6, or 12)
+  interestRate       Float               // Auto-calculated: 3 months = 1%, 6 months = 3%, 12 months = 5%
+  
+  // Personal Information
+  occupation         String?
+  employerName       String?
+  monthlyIncome      Float?
+  otherIncome        Float?
+  totalIncome        Float?
+  monthlyExpenses    Float?
+  debtToIncomeRatio  Float?
+  
+  // Emergency Contacts
+  guarantor1Name     String?
+  guarantor1Phone    String?
+  guarantor1Relationship String?
+  guarantor2Name     String?
+  guarantor2Phone    String?
+  guarantor2Relationship String?
+  
+  // Application Status
+  status             ApplicationStatus   @default(SUBMITTED)
+  statusNotes        String?
+  
+  // Review Information
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  approvedAmount     Float?
+  approvedRate       Float?
+  
+  // Documents
+  documents          LoanDocument[]
+  
+  // Disbursement
+  loan               Loan?
+  
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@map("loan_applications")
+}
+
+enum LoanType {
+  PERSONAL
+  EMERGENCY
+  BUSINESS
+  EDUCATIONAL
+  MEDICAL
+  HOUSING
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  DOCUMENTS_REQUIRED
+  COMMITTEE_REVIEW
+  APPROVED
+  REJECTED
+  DISBURSED
+  CANCELLED
+}
+
+model LoanDocument {
+  id            String          @id @default(cuid())
+  application   LoanApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String
+  
+  documentType  DocumentType
+  fileName      String
+  originalName  String
+  filePath      String
+  fileSize      Int
+  mimeType      String
+  
+  createdAt     DateTime        @default(now())
+
+  @@map("loan_documents")
+}
+
+enum DocumentType {
+  NATIONAL_ID
+  PASSPORT_PHOTO
+  INCOME_STATEMENT
+  BANK_STATEMENT
+  EMPLOYMENT_LETTER
+  GUARANTOR_ID
+  OTHER
+}
+
+// Enhanced Loan Model with Interest Rate Structure
+model Loan {
+  id                String         @id @default(cuid())
+  loanNumber        String         @unique
+  member            Member         @relation(fields: [memberId], references: [id])
+  memberId          String
+  application       LoanApplication @relation(fields: [applicationId], references: [id])
+  applicationId     String         @unique
+  
+  // Enhanced Loan Terms with Interest Rate Structure
+  principal         Float
+  interestRate      Float          // 1% for 3 months, 3% for 6 months, 5% for 12 months
+  termMonths        Int            // 3, 6, or 12 months only
+  monthlyPayment    Float
+  totalInterest     Float          // Total interest to be paid
+  totalAmount       Float          // Principal + Total Interest
+  
+  // Status
+  status            LoanStatus     @default(PENDING)
+  disbursedAt       DateTime?
+  disbursementMethod DisbursementMethod?
+  
+  // Enhanced Balances for Reconciliation
+  amountDisbursed      Float       @default(0)
+  totalRepaid          Float       @default(0)
+  principalRepaid      Float       @default(0)
+  interestRepaid       Float       @default(0)
+  outstandingPrincipal Float       @default(0)
+  outstandingInterest  Float       @default(0)
+  outstandingBalance   Float       @default(0)
+  
+  // Processing
+  processingFee     Float          @default(0)
+  processedBy       User?          @relation("ProcessedLoans", fields: [processedById], references: [id])
+  processedById     String?
+  processedAt       DateTime?
+  
+  // Accounting & Reconciliation
+  isFullyReconciled Boolean        @default(false)
+  lastReconciledAt  DateTime?
+  
+  // Relations
+  payments          Payment[]
+  paymentSchedule   PaymentSchedule[]
+  
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@map("loans")
+}
+
+enum LoanStatus {
+  PENDING
+  APPROVED
+  DISBURSED
+  ACTIVE
+  COMPLETED
+  DEFAULTED
+  CANCELLED
+}
+
+enum DisbursementMethod {
+  BANK_TRANSFER
+  CHEQUE
+  CASH
+  MOBILE_MONEY
+}
+
+// Enhanced Payment Schedule for Interest Calculations
+model PaymentSchedule {
+  id                String        @id @default(cuid())
+  loan              Loan          @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  loanId            String
+  
+  installmentNumber Int
+  dueDate           DateTime
+  principalAmount   Float
+  interestAmount    Float
+  totalAmount       Float
+  
+  status            PaymentStatus @default(PENDING)
+  paidAmount        Float         @default(0)
+  paidPrincipal     Float         @default(0)
+  paidInterest      Float         @default(0)
+  paidDate          DateTime?
+  lateFee           Float         @default(0)
+  
+  // Reconciliation
+  isReconciled      Boolean       @default(false)
+  reconciledAt      DateTime?
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@map("payment_schedules")
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+  OVERDUE
+  WAIVED
+}
+
+// Welfare Benefits Management
+model WelfareApplication {
+  id            String              @id @default(cuid())
+  member        Member              @relation(fields: [memberId], references: [id])
+  memberId      String
+  
+  benefitType   WelfareBenefitType
+  requestedAmount Float
+  reason        String
+  description   String?
+  
+  status        WelfareStatus       @default(PENDING)
+  approvedAmount Float?
+  disbursedAmount Float?
+  
+  approvedBy    String?
+  approvedAt    DateTime?
+  disbursedAt   DateTime?
+  
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@map("welfare_applications")
+}
+
+enum WelfareBenefitType {
+  MEDICAL_ASSISTANCE
+  EMERGENCY_SUPPORT
+  BURIAL_SUPPORT
+  MATERNITY_SUPPORT
+  EDUCATION_SUPPORT
+  HARDSHIP_SUPPORT
+  OTHER
+}
+
+enum WelfareStatus {
+  PENDING
+  APPROVED
+  DISBURSED
+  REJECTED
+  CANCELLED
+}
+
+// End of Service Benefits (ESB)
+model ESBRecord {
+  id                String    @id @default(cuid())
+  member            Member    @relation(fields: [memberId], references: [id])
+  memberId          String
+  
+  yearOfService     Int
+  contributionYear  Int
+  monthlyContribution Float
+  annualContribution Float
+  
+  investmentShare   Float     @default(0)
+  profitShare       Float     @default(0)
+  lossShare         Float     @default(0)
+  
+  isEligible        Boolean   @default(false)
+  esbAmount         Float     @default(0)
+  disbursedAmount   Float     @default(0)
+  disbursedAt       DateTime?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("esb_records")
+}
+
+// Business Services Network
+model BusinessService {
+  id              String           @id @default(cuid())
+  member          Member           @relation(fields: [memberId], references: [id])
+  memberId        String
+  
+  businessName    String
+  businessType    BusinessType
+  description     String?
+  contactPhone    String?
+  contactEmail    String?
+  website         String?
+  
+  subscriptionType SubscriptionType @default(BASIC)
+  subscriptionFee Float            @default(0)
+  subscriptionStart DateTime       @default(now())
+  subscriptionEnd DateTime?
+  
+  isActive        Boolean          @default(true)
+  discountOffered Float            @default(0)
+  
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("business_services")
+}
+
+enum BusinessType {
+  RETAIL
+  SERVICES
+  CONSULTING
+  TECHNOLOGY
+  AGRICULTURE
+  MANUFACTURING
+  HOSPITALITY
+  HEALTHCARE
+  EDUCATION
+  OTHER
+}
+
+enum SubscriptionType {
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}
+
+// Financial Management & Investments
+model Investment {
+  id              String           @id @default(cuid())
+  investmentType  InvestmentType
+  name            String
+  description     String?
+  
+  initialAmount   Float
+  currentValue    Float
+  profitLoss      Float            @default(0)
+  
+  startDate       DateTime         @default(now())
+  maturityDate    DateTime?
+  
+  status          InvestmentStatus @default(ACTIVE)
+  
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("investments")
+}
+
+enum InvestmentType {
+  FIXED_DEPOSIT
+  TREASURY_BILLS
+  BONDS
+  EQUITY
+  REAL_ESTATE
+  BUSINESS_VENTURE
+  OTHER
+}
+
+enum InvestmentStatus {
+  ACTIVE
+  MATURED
+  LIQUIDATED
+  DEFAULTED
+}
+
+// Enhanced Audit Log for Comprehensive Tracking
+model AuditLog {
+  id        String      @id @default(cuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+  action    AuditAction
+  entity    String      // Table name
+  entityId  String      // Record ID
+  oldValues Json?       // Previous values
+  newValues Json?       // New values
+  ipAddress String?
+  userAgent String?
+  
+  createdAt DateTime    @default(now())
+
+  @@map("audit_logs")
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  APPROVE
+  REJECT
+  DISBURSE
+  RECONCILE
+  EDIT_MEMBER
+  DELETE_MEMBER
+}
+
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+  description String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_config")
+}
+
+// Reconciliation Records for Accounting
+model ReconciliationRecord {
+  id              String    @id @default(cuid())
+  
+  reconciliationType ReconciliationType
+  referenceNumber String   // Loan number, payment receipt number, etc.
+  entityId        String   // ID of the loan, payment, etc.
+  
+  expectedAmount  Float
+  actualAmount    Float
+  difference      Float
+  
+  status          ReconciliationStatus @default(PENDING)
+  notes           String?
+  
+  reconciledBy    String?
+  reconciledAt    DateTime?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("reconciliation_records")
+}
+
+enum ReconciliationType {
+  LOAN_PAYMENT
+  LOAN_INTEREST
+  MEMBER_CONTRIBUTION
+  WELFARE_DISBURSEMENT
+  ESB_CONTRIBUTION
+  BANK_TRANSACTION
+}
+
+enum ReconciliationStatus {
+  PENDING
+  RECONCILED
+  DISCREPANCY
+  RESOLVED
+}
+
+// Chart of Accounts System
+model ChartOfAccounts {
+  id              String          @id @default(cuid())
+  accountCode     String          @unique
+  accountName     String
+  accountType     ChartAccountType
+  parentAccountId String?
+  parentAccount   ChartOfAccounts? @relation("AccountHierarchy", fields: [parentAccountId], references: [id])
+  childAccounts   ChartOfAccounts[] @relation("AccountHierarchy")
+  
+  description     String?
+  isActive        Boolean         @default(true)
+  balance         Float           @default(0)
+  
+  // Relations
+  journalLines    JournalLine[]
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("chart_of_accounts")
+}
+
+enum ChartAccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+  WELFARE_CONTRIBUTIONS
+  LOAN_ACCOUNTS
+  INVESTMENT_ACCOUNTS
+  ADMINISTRATIVE_ACCOUNTS
+}
+
+// Journal Entry System
+model JournalEntry {
+  id              String          @id @default(cuid())
+  entryNumber     String          @unique
+  date            DateTime        @default(now())
+  description     String
+  reference       String?
+  
+  // Relations
+  journalLines    JournalLine[]
+  createdBy       User            @relation("CreatedJournalEntries", fields: [createdById], references: [id])
+  createdById     String
+  
+  // Status
+  isPosted        Boolean         @default(false)
+  postedAt        DateTime?
+  postedBy        String?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("journal_entries")
+}
+
+model JournalLine {
+  id              String          @id @default(cuid())
+  journalEntry    JournalEntry    @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  journalEntryId  String
+  
+  account         ChartOfAccounts @relation(fields: [accountId], references: [id])
+  accountId       String
+  
+  description     String?
+  debitAmount     Float           @default(0)
+  creditAmount    Float           @default(0)
+  
+  createdAt       DateTime        @default(now())
+
+  @@map("journal_lines")
+}
+
+// Payment Matching System
+model PaymentMatch {
+  id              String          @id @default(cuid())
+  payment         Payment         @relation(fields: [paymentId], references: [id])
+  paymentId       String
+  member          Member          @relation(fields: [memberId], references: [id])
+  memberId        String
+  
+  matchedAmount   Float
+  matchType       PaymentMatchType
+  matchStatus     PaymentMatchStatus @default(PENDING)
+  
+  notes           String?
+  matchedBy       String?
+  matchedAt       DateTime?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("payment_matches")
+}
+
+enum PaymentMatchType {
+  WELFARE_CONTRIBUTION
+  LOAN_REPAYMENT
+  MEMBERSHIP_FEE
+  SPECIAL_LEVY
+  OTHER
+}
+
+enum PaymentMatchStatus {
+  PENDING
+  MATCHED
+  DISPUTED
+  RESOLVED
+}
