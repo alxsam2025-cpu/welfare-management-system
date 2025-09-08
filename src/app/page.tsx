@@ -230,6 +230,72 @@ export default function Dashboard() {
       </div>
 
       <div className="container-custom py-8">
+        {/* PRAWS About Section - Moved to Top */}
+        <div className="card-glow p-8 mb-8 fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-gradient mb-2">About PRAWS</h2>
+            <h3 className="text-xl font-semibold text-gray-700 mb-4">
+              PARLIAMENTARIAN RESEARCH ASSISTANT WELFARE SCHEME (PRAWS)
+            </h3>
+            <p className="text-lg text-purple-700 font-medium mb-6">
+              NINTH PARLIAMENT OF GHANA
+            </p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
+            <p className="text-gray-700 leading-relaxed mb-4">
+              The Parliamentarian Research Assistance Welfare has been established to promote financial security, 
+              well-being, and professional empowerment for all <strong>276 Research Assistants (RAs)</strong> serving 
+              Members of Parliament. The scheme seeks to:
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <div className="text-blue-600 font-semibold mb-2">1.01</div>
+                <p className="text-sm text-gray-700">
+                  Provide timely financial support during emergencies and critical life events.
+                </p>
+              </div>
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <div className="text-purple-600 font-semibold mb-2">1.02</div>
+                <p className="text-sm text-gray-700">
+                  Offer a structured, transparent, and self-sustaining system for contributions, loans, and benefits.
+                </p>
+              </div>
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <div className="text-green-600 font-semibold mb-2">1.03</div>
+                <p className="text-sm text-gray-700">
+                  Foster a spirit of solidarity, accountability, and financial leverage among RAs.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6">
+              <h4 className="text-xl font-bold mb-3 flex items-center">
+                <TrendingUp className="w-6 h-6 mr-2" />
+                Our Mission
+              </h4>
+              <p className="text-blue-100 leading-relaxed">
+                To enhance the socio-economic leverage among Research Assistants by providing accessible 
+                and responsive welfare support mechanisms.
+              </p>
+            </div>
+            
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6">
+              <h4 className="text-xl font-bold mb-3 flex items-center">
+                <Eye className="w-6 h-6 mr-2" />
+                Our Vision
+              </h4>
+              <p className="text-purple-100 leading-relaxed">
+                To become a sustainable and empowering welfare scheme that supports the holistic growth and 
+                financial stability for all Parliamentarian Research Assistants in Ghana.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Members */}
@@ -365,7 +431,7 @@ export default function Dashboard() {
             <Eye className="w-6 h-6 mr-3 text-blue-600" />
             Quick Actions
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <Link href="/members" className="btn btn-outline flex-col h-24 gap-2">
               <Users className="w-6 h-6" />
               <span className="text-xs">Members</span>
@@ -390,6 +456,10 @@ export default function Dashboard() {
               <BookOpen className="w-6 h-6" />
               <span className="text-xs">Journal</span>
             </Link>
+            <Link href="/bank" className="btn btn-outline flex-col h-24 gap-2">
+              <PiggyBank className="w-6 h-6" />
+              <span className="text-xs">Banking</span>
+            </Link>
             <Link href="/business" className="btn btn-outline flex-col h-24 gap-2">
               <TrendingUp className="w-6 h-6" />
               <span className="text-xs">Business</span>
@@ -409,71 +479,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* PRAWS About Section */}
-        <div className="card-glow p-8 mb-8 fade-in" style={{ animationDelay: '0.7s' }}>
-          <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-gradient mb-2">About PRAWS</h2>
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">
-              PARLIAMENTARIAN RESEARCH ASSISTANT WELFARE SCHEME (PRAWS)
-            </h3>
-            <p className="text-lg text-purple-700 font-medium mb-6">
-              NINTH PARLIAMENT OF GHANA
-            </p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
-            <p className="text-gray-700 leading-relaxed mb-4">
-              The Parliamentarian Research Assistance Welfare has been established to promote financial security, 
-              well-being, and professional empowerment for all <strong>276 Research Assistants (RAs)</strong> serving 
-              Members of Parliament. The scheme seeks to:
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="text-blue-600 font-semibold mb-2">1.01</div>
-                <p className="text-sm text-gray-700">
-                  Provide timely financial support during emergencies and critical life events.
-                </p>
-              </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="text-purple-600 font-semibold mb-2">1.02</div>
-                <p className="text-sm text-gray-700">
-                  Offer a structured, transparent, and self-sustaining system for contributions, loans, and benefits.
-                </p>
-              </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="text-green-600 font-semibold mb-2">1.03</div>
-                <p className="text-sm text-gray-700">
-                  Foster a spirit of solidarity, accountability, and financial leverage among RAs.
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6">
-              <h4 className="text-xl font-bold mb-3 flex items-center">
-                <TrendingUp className="w-6 h-6 mr-2" />
-                Our Mission
-              </h4>
-              <p className="text-blue-100 leading-relaxed">
-                To enhance the socio-economic leverage among Research Assistants by providing accessible 
-                and responsive welfare support mechanisms.
-              </p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6">
-              <h4 className="text-xl font-bold mb-3 flex items-center">
-                <Eye className="w-6 h-6 mr-2" />
-                Our Vision
-              </h4>
-              <p className="text-purple-100 leading-relaxed">
-                To become a sustainable and empowering welfare scheme that supports the holistic growth and 
-                financial stability for all Parliamentarian Research Assistants in Ghana.
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* System Status */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 fade-in" style={{ animationDelay: '0.8s' }}>
