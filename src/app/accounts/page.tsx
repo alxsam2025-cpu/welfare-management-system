@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { 
   BookOpen, 
@@ -30,9 +30,51 @@ interface ChartAccount {
   createdAt: string
 }
 
+const initialAccounts: ChartAccount[] = [
+  {
+    id: '1',
+    accountCode: '1000',
+    accountName: 'Cash and Bank',
+    accountType: 'ASSET',
+    balance: 234567.89,
+    isActive: true,
+    description: 'Cash in hand and bank balances',
+    createdAt: '2023-01-01'
+  },
+  {
+    id: '2',
+    accountCode: '1100',
+    accountName: 'Member Contributions Receivable',
+    accountType: 'ASSET',
+    balance: 12500.00,
+    isActive: true,
+    description: 'Outstanding member welfare contributions',
+    createdAt: '2023-01-01'
+  },
+  {
+    id: '3',
+    accountCode: '1200',
+    accountName: 'Loans Receivable',
+    accountType: 'ASSET',
+    balance: 89450.00,
+    isActive: true,
+    description: 'Outstanding member loans',
+    createdAt: '2023-01-01'
+  },
+  {
+    id: '4',
+    accountCode: '2000',
+    accountName: 'Member Welfare Fund',
+    accountType: 'LIABILITY',
+    balance: 156780.50,
+    isActive: true,
+    description: 'Total member welfare contributions',
+    createdAt: '2023-01-01'
+  }
+]
+
 export default function ChartOfAccountsPage() {
-  const [accounts, setAccounts] = useState<ChartAccount[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [accounts, setAccounts] = useState<ChartAccount[]>(initialAccounts)
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [showAddForm, setShowAddForm] = useState(false)
@@ -44,146 +86,6 @@ export default function ChartOfAccountsPage() {
     balance: 0
   })
 
-  useEffect(() => {
-    // Load demo chart of accounts data
-    const loadAccounts = () => {
-      try {
-        console.log('Loading accounts data...')
-        const demoAccounts: ChartAccount[] = [
-        {
-          id: '1',
-          accountCode: '1000',
-          accountName: 'Cash and Bank',
-          accountType: 'ASSET',
-          balance: 234567.89,
-          isActive: true,
-          description: 'Cash in hand and bank balances',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '2',
-          accountCode: '1100',
-          accountName: 'Member Contributions Receivable',
-          accountType: 'ASSET',
-          balance: 12500.00,
-          isActive: true,
-          description: 'Outstanding member welfare contributions',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '3',
-          accountCode: '1200',
-          accountName: 'Loans Receivable',
-          accountType: 'ASSET',
-          balance: 89450.00,
-          isActive: true,
-          description: 'Outstanding member loans',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '4',
-          accountCode: '1300',
-          accountName: 'Interest Receivable',
-          accountType: 'ASSET',
-          balance: 4500.00,
-          isActive: true,
-          description: 'Accrued interest on loans',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '5',
-          accountCode: '2000',
-          accountName: 'Member Welfare Fund',
-          accountType: 'LIABILITY',
-          balance: 156780.50,
-          isActive: true,
-          description: 'Total member welfare contributions',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '6',
-          accountCode: '2100',
-          accountName: 'Emergency Fund Reserve',
-          accountType: 'LIABILITY',
-          balance: 50000.00,
-          isActive: true,
-          description: 'Reserved funds for emergency assistance',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '7',
-          accountCode: '3000',
-          accountName: 'PRAWS Capital Fund',
-          accountType: 'EQUITY',
-          balance: 100000.00,
-          isActive: true,
-          description: 'Initial capital and retained earnings',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '8',
-          accountCode: '4000',
-          accountName: 'Member Contributions Income',
-          accountType: 'REVENUE',
-          balance: 180000.00,
-          isActive: true,
-          description: 'Monthly member welfare contributions',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '9',
-          accountCode: '4100',
-          accountName: 'Interest Income',
-          accountType: 'REVENUE',
-          balance: 8970.00,
-          isActive: true,
-          description: 'Interest earned on member loans',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '10',
-          accountCode: '5000',
-          accountName: 'Administrative Expenses',
-          accountType: 'EXPENSE',
-          balance: 15000.00,
-          isActive: true,
-          description: 'General administrative costs',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '11',
-          accountCode: '5100',
-          accountName: 'Welfare Disbursements',
-          accountType: 'EXPENSE',
-          balance: 45000.00,
-          isActive: true,
-          description: 'Emergency assistance and welfare payments',
-          createdAt: '2023-01-01'
-        },
-        {
-          id: '12',
-          accountCode: '5200',
-          accountName: 'Bank Charges',
-          accountType: 'EXPENSE',
-          balance: 1200.00,
-          isActive: true,
-          description: 'Banking fees and transaction charges',
-          createdAt: '2023-01-01'
-        }
-      ]
-      
-      console.log('Setting accounts:', demoAccounts.length, 'accounts')
-      setAccounts(demoAccounts)
-      setIsLoading(false)
-      console.log('Accounts loaded successfully')
-      } catch (error) {
-        console.error('Error loading accounts:', error)
-        setIsLoading(false)
-      }
-    }
-
-    loadAccounts()
-  }, [])
 
   const formatCurrency = (amount: number) => {
     return `₵${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -227,17 +129,6 @@ export default function ChartOfAccountsPage() {
       .reduce((sum, acc) => sum + acc.balance, 0)
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-600">Loading Chart of Accounts...</h2>
-          <p className="text-gray-500">Please wait while we fetch accounting data</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
