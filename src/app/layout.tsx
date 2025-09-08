@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
@@ -10,14 +10,18 @@ export const metadata: Metadata = {
   description: 'A comprehensive welfare management system for Parliamentarian Research Assistants',
   keywords: ['welfare', 'management', 'PRAWS', 'parliamentarian', 'research assistants'],
   authors: [{ name: 'PRAWS Development Team' }],
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#0ea5e9',
   openGraph: {
     title: 'PRAWS Welfare Management System',
     description: 'A comprehensive welfare management system for Parliamentarian Research Assistants',
     type: 'website',
     locale: 'en_US',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#0ea5e9',
 }
 
 export default function RootLayout({
