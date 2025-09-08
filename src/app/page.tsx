@@ -20,7 +20,8 @@ import {
   Activity,
   Banknote,
   UserPlus,
-  FileCheck
+  FileCheck,
+  BookOpen
 } from 'lucide-react'
 
 interface DashboardStats {
@@ -193,9 +194,14 @@ export default function Dashboard() {
         <div className="container-custom py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="mb-6 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-2 text-gradient-white">
-                PRAWS Welfare System
-              </h1>
+              <div className="mb-4">
+                <h2 className="text-lg text-blue-200 font-medium mb-1">
+                  Welcome to PRAWS Management System
+                </h2>
+                <h1 className="text-4xl md:text-5xl font-bold mb-2 text-gradient-white">
+                  PRAWS Welfare System
+                </h1>
+              </div>
               <p className="text-xl text-blue-100">
                 Parliamentarian Research Assistant Welfare Scheme
               </p>
@@ -359,7 +365,7 @@ export default function Dashboard() {
             <Eye className="w-6 h-6 mr-3 text-blue-600" />
             Quick Actions
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             <Link href="/members" className="btn btn-outline flex-col h-24 gap-2">
               <Users className="w-6 h-6" />
               <span className="text-xs">Members</span>
@@ -380,9 +386,21 @@ export default function Dashboard() {
               <Building2 className="w-6 h-6" />
               <span className="text-xs">Accounts</span>
             </Link>
+            <Link href="/journal" className="btn btn-outline flex-col h-24 gap-2">
+              <BookOpen className="w-6 h-6" />
+              <span className="text-xs">Journal</span>
+            </Link>
+            <Link href="/business" className="btn btn-outline flex-col h-24 gap-2">
+              <TrendingUp className="w-6 h-6" />
+              <span className="text-xs">Business</span>
+            </Link>
             <Link href="/reports" className="btn btn-outline flex-col h-24 gap-2">
               <FileText className="w-6 h-6" />
               <span className="text-xs">Reports</span>
+            </Link>
+            <Link href="/settings" className="btn btn-outline flex-col h-24 gap-2">
+              <AlertCircle className="w-6 h-6" />
+              <span className="text-xs">Settings</span>
             </Link>
             <Link href="/demo" className="btn btn-secondary flex-col h-24 gap-2">
               <Eye className="w-6 h-6" />
